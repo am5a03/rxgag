@@ -11,10 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jakewharton.rxbinding.support.design.widget.RxTabLayout;
+import com.jakewharton.rxbinding.support.design.widget.TabLayoutSelectionEvent;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
 import dnomyar.rxgag.ui.adapters.PostListPagerAdapter;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Raymond on 2015-11-09.
@@ -39,6 +44,8 @@ public class PostListMainFragment extends BaseFragment {
     @Bind(R.id.tab_layout)
     TabLayout mTabLayout;
 
+    private Subscription mTabLayoutSubscription;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,12 +66,24 @@ public class PostListMainFragment extends BaseFragment {
         PagerAdapter adapter = new PostListPagerAdapter(getChildFragmentManager());
         mToolbar.setTitle("RxGag");
         mViewPager.setAdapter(adapter);
+        mTabLayout.setTabsFromPagerAdapter(adapter);
         mTabLayout.setupWithViewPager(mViewPager);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        mTabLayoutSubscription = RxTabLayout.selectionEvents(mTabLayout)
+                .subscribe(tabLayoutSelectionEvent -> {
+                    if (tabLayoutSelectionEvent.kind() ==
+                            TabLayoutSelectionEvent.Kind.RESELECTED) {
+
+                    } else if (tabLayoutSelectionEvent.kind() ==
+                            TabLayoutSelectionEvent.Kind.SELECTED) {
+                        mViewPager.setCurrentItem(mTabLayout.getSelectedTabPosition());
+                    }
+                });
     }
 
     @Override
@@ -80,5 +99,6 @@ public class PostListMainFragment extends BaseFragment {
     @Override
     public void onStop() {
         super.onStop();
+        mTabLayoutSubscription.unsubscribe();
     }
 }

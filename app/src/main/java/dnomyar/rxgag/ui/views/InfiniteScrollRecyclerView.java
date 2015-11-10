@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollStateChangeEvent;
@@ -11,13 +12,16 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Raymond on 2015-11-10.
  */
 public class InfiniteScrollRecyclerView extends RecyclerView {
+    private static final String TAG = "ISRecyclerView";
     private Subscription mScrollEventSubscriber;
 
     public InfiniteScrollRecyclerView(Context context) {
@@ -36,6 +40,7 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         mScrollEventSubscriber = RxRecyclerView.scrollStateChangeEvents(this)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onScrollStateChanged);
     }
 
@@ -55,8 +60,9 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
             int childCount = ll.getChildCount();
 
             if (firstVisiblePosition + childCount >= itemCount) {
-
+                Log.d(TAG, "onScrollStateChanged: Load more");
             }
+            Log.d(TAG, "onScrollStateChanged: " + firstVisiblePosition);
         }
     }
 }
