@@ -8,6 +8,7 @@ public class Gag {
     public String caption;
     public String link;
     public Images images;
+    public Votes votes;
 
     public static class Images {
         public String small, normal, large;

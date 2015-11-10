@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RxGag</string>
+    <string name="points">%1$s points</string>
 </resources>

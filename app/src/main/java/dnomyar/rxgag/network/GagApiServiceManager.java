@@ -13,6 +13,8 @@ import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 /**
  * Created by Raymond on 2015-11-02.
@@ -22,24 +24,24 @@ public class GagApiServiceManager {
 
     private GagListService mGagListService;
 
-    public GagApiServiceManager() {
+    private PublishSubject<Void> mDownloadSubject;
+    private BehaviorSubject<List<Gag>> mGagListSubject;
+
+    public GagApiServiceManager(OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(new OkHttpClient())
+                .client(client)
                 .baseUrl(HOST)
                 .build();
         mGagListService = retrofit.create(GagListService.class);
+
+        final BehaviorSubject<String> requestsPageSubject = BehaviorSubject.create("0");
     }
 
     public Observable<List<Gag>> getGagList(String section, String page) {
         return mGagListService
                 .getGagListResponse(section, page)
-                .map(new Func1<ApiGagResponse, List<Gag>>() {
-                    @Override
-                    public List<Gag> call(ApiGagResponse apiGagResponse) {
-                        return Arrays.asList(apiGagResponse.data);
-                    }
-                });
+                .map(apiGagResponse -> Arrays.asList(apiGagResponse.data));
     }
 }
