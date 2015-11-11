@@ -24,8 +24,6 @@ public class GagApiServiceManager {
 
     private GagListService mGagListService;
 
-    private PublishSubject<Void> mDownloadSubject;
-    private BehaviorSubject<List<Gag>> mGagListSubject;
 
     public GagApiServiceManager(OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -35,13 +33,10 @@ public class GagApiServiceManager {
                 .baseUrl(HOST)
                 .build();
         mGagListService = retrofit.create(GagListService.class);
-
-        final BehaviorSubject<String> requestsPageSubject = BehaviorSubject.create("0");
     }
 
-    public Observable<List<Gag>> getGagList(String section, String page) {
+    public Observable<ApiGagResponse> getGagList(String section, String page) {
         return mGagListService
-                .getGagListResponse(section, page)
-                .map(apiGagResponse -> Arrays.asList(apiGagResponse.data));
+                .getGagListResponse(section, page);
     }
 }

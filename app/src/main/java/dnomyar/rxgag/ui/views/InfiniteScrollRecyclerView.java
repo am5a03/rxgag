@@ -13,9 +13,6 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by Raymond on 2015-11-10.
@@ -23,6 +20,7 @@ import rx.schedulers.Schedulers;
 public class InfiniteScrollRecyclerView extends RecyclerView {
     private static final String TAG = "ISRecyclerView";
     private Subscription mScrollEventSubscriber;
+    private InfiniteScrollListener mInfiniteScrollListener;
 
     public InfiniteScrollRecyclerView(Context context) {
         super(context);
@@ -50,6 +48,10 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
         mScrollEventSubscriber.unsubscribe();
     }
 
+    public void addInfiniteScrollListener(InfiniteScrollListener listener) {
+        this.mInfiniteScrollListener = listener;
+    }
+
     private void onScrollStateChanged(RecyclerViewScrollStateChangeEvent ev) {
         RecyclerView v = ev.view();
         LayoutManager layoutManager = v.getLayoutManager();
@@ -61,8 +63,16 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
 
             if (firstVisiblePosition + childCount >= itemCount) {
                 Log.d(TAG, "onScrollStateChanged: Load more");
+                if (mInfiniteScrollListener != null) {
+                    mInfiniteScrollListener.dispatchLoadMore();
+                }
             }
             Log.d(TAG, "onScrollStateChanged: " + firstVisiblePosition);
         }
+    }
+
+
+    public interface InfiniteScrollListener {
+        void dispatchLoadMore();
     }
 }

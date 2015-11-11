@@ -10,6 +10,10 @@ import dnomyar.rxgag.ui.fragments.PostListFragment;
  * Created by Raymond on 2015-11-09.
  */
 public class PostListPagerAdapter extends FragmentStatePagerAdapter {
+    private static final String PAGE_HOT = "Hot";
+    private static final String PAGE_TRENDING = "Trending";
+    private static final String PAGE_FRESH = "Fresh";
+
     private static final int NUM_OF_PAGES = 3;
 
     public PostListPagerAdapter(FragmentManager fm) {
@@ -20,11 +24,11 @@ public class PostListPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return PostListFragment.newInstance();
+                return PostListFragment.newInstance(PAGE_HOT);
             case 1:
-                return PostListFragment.newInstance();
+                return PostListFragment.newInstance(PAGE_TRENDING);
             case 2:
-                return PostListFragment.newInstance();
+                return PostListFragment.newInstance(PAGE_FRESH);
         }
         return null;
     }
@@ -33,11 +37,11 @@ public class PostListPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Hot";
+                return PAGE_HOT;
             case 1:
-                return "Trending";
+                return PAGE_TRENDING;
             case 2:
-                return "Fresh";
+                return PAGE_FRESH;
         }
         return null;
     }

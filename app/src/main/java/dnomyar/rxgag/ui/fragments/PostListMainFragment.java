@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ import rx.functions.Action1;
  * Created by Raymond on 2015-11-09.
  */
 public class PostListMainFragment extends BaseFragment {
-
+    private static final String TAG = "PostListMainFragment";
     public static PostListMainFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -66,6 +67,23 @@ public class PostListMainFragment extends BaseFragment {
         PagerAdapter adapter = new PostListPagerAdapter(getChildFragmentManager());
         mToolbar.setTitle("RxGag");
         mViewPager.setAdapter(adapter);
+        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.d(TAG, "onPageSelected: " + position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         mTabLayout.setTabsFromPagerAdapter(adapter);
         mTabLayout.setupWithViewPager(mViewPager);
 
