@@ -9,12 +9,10 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
-import dnomyar.rxgag.models.api.Gag;
+import dnomyar.rxgag.models.wrapper.Gag;
 
 /**
  * Created by Raymond on 2015-11-11.

@@ -1,14 +1,13 @@
 package dnomyar.rxgag.ui.renderers;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import dnomyar.rxgag.R;
-import dnomyar.rxgag.models.api.Gag;
+import dnomyar.rxgag.models.wrapper.Gag;
 
 /**
  * Created by Raymond on 2015-11-12.

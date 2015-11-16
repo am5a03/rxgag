@@ -4,10 +4,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import java.util.List;
-import dnomyar.rxgag.models.api.Gag;
+import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.ui.renderers.LoadingIndicatorRenderer;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
-import rx.Subscription;
 
 /**
  * Created by Raymond on 2015-11-11.

@@ -1,5 +1,7 @@
 package dnomyar.rxgag.models.api;
 
+import dnomyar.rxgag.models.wrapper.Gag;
+
 /**
  * Created by Raymond on 2015-11-01.
  */

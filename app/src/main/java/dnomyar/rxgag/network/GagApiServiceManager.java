@@ -2,19 +2,11 @@ package dnomyar.rxgag.network;
 
 import com.squareup.okhttp.OkHttpClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import dnomyar.rxgag.models.api.ApiGagResponse;
-import dnomyar.rxgag.models.api.Gag;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
 import rx.Observable;
-import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
 /**
  * Created by Raymond on 2015-11-02.

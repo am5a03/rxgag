@@ -1,4 +1,4 @@
-package dnomyar.rxgag.models.api;
+package dnomyar.rxgag.models.wrapper;
 
 /**
  * Created by Raymond on 2015-11-01.

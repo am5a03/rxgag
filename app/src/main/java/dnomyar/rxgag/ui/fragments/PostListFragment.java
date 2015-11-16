@@ -6,14 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,17 +21,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
-import dnomyar.rxgag.models.api.ApiGagResponse;
-import dnomyar.rxgag.models.api.Gag;
+import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.network.GagApiServiceManager;
 import dnomyar.rxgag.ui.adapters.PostListAdapter;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
 import dnomyar.rxgag.ui.views.InfiniteScrollRecyclerView;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**

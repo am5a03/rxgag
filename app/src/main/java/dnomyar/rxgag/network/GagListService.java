@@ -1,9 +1,6 @@
 package dnomyar.rxgag.network;
 
-import java.util.List;
-
 import dnomyar.rxgag.models.api.ApiGagResponse;
-import dnomyar.rxgag.models.api.Gag;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import rx.Observable;

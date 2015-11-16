@@ -1,4 +1,4 @@
-package dnomyar.rxgag.models.api;
+package dnomyar.rxgag.models.wrapper;
 
 import java.util.List;
 
