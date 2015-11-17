@@ -11,5 +11,5 @@ import rx.Observable;
  */
 public interface GagRepositoryInterface {
     Observable<List<GagItem>> getGagListItem(String section, String page);
-    Observable<GagItem> replaceGagItem(Gag gag);
+    Observable<GagItem> replaceGagItem(Gag gag, String section);
 }

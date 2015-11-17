@@ -1,4 +1,4 @@
-package dnomyar.rxgag.repository;
+package dnomyar.rxgag.repository.realm.rx;
 
 import android.content.Context;
 
