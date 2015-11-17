@@ -16,7 +16,7 @@ import rx.subscriptions.Subscriptions;
  */
 
 
-public abstract class OnSubscribeRealm<T extends RealmObject> implements Observable.OnSubscribe<T> {
+public abstract class OnSubscribeRealm<T> implements Observable.OnSubscribe<T> {
     private Context context;
     private RealmConfiguration mRealmConfiguration;
 
