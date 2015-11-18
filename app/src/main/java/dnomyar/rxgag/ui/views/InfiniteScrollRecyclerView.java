@@ -6,11 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollStateChangeEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 
-import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -21,6 +18,7 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
     private static final String TAG = "ISRecyclerView";
     private Subscription mScrollEventSubscriber;
     private InfiniteScrollListener mInfiniteScrollListener;
+    private boolean mIsLoading;
 
     public InfiniteScrollRecyclerView(Context context) {
         super(context);
@@ -37,9 +35,10 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mScrollEventSubscriber = RxRecyclerView.scrollStateChangeEvents(this)
+        mScrollEventSubscriber = RxRecyclerView.scrollStateChanges(this)
+                .filter(isLoading -> ! isLoading()) // Filter all scrolling events when it's already loading
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onScrollStateChanged);
+                .subscribe(this::onScrollStateChanges); // What to do with scrolling event?
     }
 
     @Override
@@ -52,8 +51,8 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
         this.mInfiniteScrollListener = listener;
     }
 
-    private void onScrollStateChanged(RecyclerViewScrollStateChangeEvent ev) {
-        RecyclerView v = ev.view();
+    private void onScrollStateChanges(int state) {
+        RecyclerView v = this;
         LayoutManager layoutManager = v.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             LinearLayoutManager ll = (LinearLayoutManager) layoutManager;
@@ -71,6 +70,13 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
         }
     }
 
+    public void setIsLoading(boolean isLoading) {
+        mIsLoading = isLoading;
+    }
+
+    public boolean isLoading() {
+        return mIsLoading;
+    }
 
     public interface InfiniteScrollListener {
         void dispatchLoadMore();

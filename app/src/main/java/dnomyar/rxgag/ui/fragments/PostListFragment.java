@@ -21,13 +21,18 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
+import dnomyar.rxgag.models.api.ApiGagResponse;
 import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.network.GagApiServiceManager;
 import dnomyar.rxgag.ui.adapters.PostListAdapter;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
 import dnomyar.rxgag.ui.views.InfiniteScrollRecyclerView;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -88,15 +93,20 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         mSection = getArguments().getString("section");
         mSection = mSection.toLowerCase();
         if (savedInstanceState == null) {
-            mInit = mGagApiServiceManager.getGagList(mSection, mPageOffset)
-                    .doOnNext(apiGagResponse -> mPageOffset = apiGagResponse.paging.next)
-                    .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(gagList -> {
-                        mGagList.addAll(gagList);
-                        mInfiniteScrollView.getAdapter().notifyItemRangeInserted(0, gagList.size());
-                    });
+//            mInit = mGagApiServiceManager.getGagList(mSection, mPageOffset)
+//                    .doOnNext(apiGagResponse -> {
+//                        mPageOffset = apiGagResponse.paging.next;
+//                        mInfiniteScrollView.setIsLoading(true);
+//                    })
+//                    .doOnCompleted(() -> mInfiniteScrollView.setIsLoading(false))
+//                    .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeOn(Schedulers.io())
+//                    .subscribe(gagList -> {
+//                        mGagList.addAll(gagList);
+//                        mInfiniteScrollView.getAdapter().notifyItemRangeInserted(0, gagList.size());
+//                    });
+            mInit = getGagSubscription();
         }
     }
 
@@ -136,16 +146,46 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
 
     @Override
     public void dispatchLoadMore() {
-        mLoadMore = mGagApiServiceManager.getGagList(mSection, mPageOffset)
-                .doOnNext(apiGagResponse -> mPageOffset = apiGagResponse.paging.next)
-                .debounce(5, TimeUnit.SECONDS)
+        mLoadMore = getGagSubscription();
+
+    }
+
+    private Subscription getGagSubscription() {
+        return mGagApiServiceManager.getGagList(mSection, mPageOffset)
+                // get the paging offset
+                .doOnNext(apiGagResponse -> {
+                    mPageOffset = apiGagResponse.paging.next;
+                    mInfiniteScrollView.setIsLoading(true);
+                })
+                .onErrorReturn(throwable -> {
+                    mInfiniteScrollView.setIsLoading(false);
+                    return null; // Return null for any errors
+                })
+                // Skip all null result
+                .filter(apiGagResponse -> apiGagResponse != null)
+                // We map the response to a list
                 .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
+                // We convert the ArrayList to a single Object
+                .flatMap(gags -> Observable.from(gags))
+                // We observe on main thread
                 .observeOn(AndroidSchedulers.mainThread())
+                // The sequence should be generated from background thread
                 .subscribeOn(Schedulers.io())
-                .subscribe(gagList -> {
-                    mGagList.addAll(gagList);
-                    mInfiniteScrollView.getAdapter().notifyItemRangeInserted(mGagList.size(), gagList.size());
-                    Toast.makeText(getActivity(), mPageOffset, Toast.LENGTH_SHORT).show();
+                // onNext()
+                .subscribe(gag -> {
+                    mGagList.add(gag);
+                    mInfiniteScrollView.getAdapter().notifyItemInserted(mGagList.size());
+                },
+                // onError()
+                    throwable -> {
+                    // Subscribe to Error events on UI thread
+                    Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                },
+                // onCompleted
+                    () -> {
+                        // The whole sequence is completed
+                        Toast.makeText(getActivity(), mPageOffset, Toast.LENGTH_SHORT).show();
+                        mInfiniteScrollView.setIsLoading(false);
                 });
     }
 }
