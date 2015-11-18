@@ -2,6 +2,7 @@ package dnomyar.rxgag.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -46,6 +47,9 @@ public class PostListMainFragment extends BaseFragment {
     @Bind(R.id.tab_layout)
     TabLayout mTabLayout;
 
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
+
     private Subscription mTabLayoutSubscription;
 
     @Override
@@ -87,7 +91,13 @@ public class PostListMainFragment extends BaseFragment {
         });
         mTabLayout.setTabsFromPagerAdapter(adapter);
         mTabLayout.setupWithViewPager(mViewPager);
-
+        mFab.setOnClickListener(v -> {
+            FragmentStatePagerAdapter adapter1
+                    = (FragmentStatePagerAdapter) mViewPager.getAdapter();
+            PostListFragment f
+                    = (PostListFragment) adapter1.instantiateItem(mViewPager, mViewPager.getCurrentItem());
+            f.scrollToTopAndRefresh();
+        });
     }
 
     @Override

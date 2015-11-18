@@ -22,6 +22,7 @@ import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
 import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.network.GagApiServiceManager;
+import dnomyar.rxgag.repository.GagRepository;
 import dnomyar.rxgag.repository.GagRepositoryInterface;
 import dnomyar.rxgag.ui.adapters.PostListAdapter;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
@@ -90,6 +91,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGagApiServiceManager = new GagApiServiceManager(RxGagApplication.getClient());
+        mGagRepository = new GagRepository(getActivity());
         mGagList = new ArrayList<>();
         mSection = getArguments().getString("section");
         mSection = mSection.toLowerCase();
@@ -195,39 +197,39 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     }
 
 
-    Observable<Gag> cache = null;
-    Observable<Gag> disk = mGagRepository.getGagList(mSection, mPageOffset)
-            .flatMap(gags -> Observable.from(gags))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io());
-    Observable<Gag> network = mGagApiServiceManager.getGagList(mSection, mPageOffset)
-            // get the paging offset
-            .doOnNext(apiGagResponse -> {
-                mPageOffset = apiGagResponse.paging.next;
-                mInfiniteScrollView.setIsLoading(true);
-            })
-            .doOnCompleted(() -> {
-                mInfiniteScrollView.setIsLoading(false);
-                Log.d(TAG, "getNetworkGagSubscription: api completed page=" + mPageOffset);
-            })
-            .onErrorReturn(throwable -> {
-                throwable.printStackTrace();
-                mInfiniteScrollView.setIsLoading(false);
-                mSwipeRefreshLayout.setRefreshing(false);
-                return null; // Return null for any errors
-            })
-            .filter(apiGagResponse -> apiGagResponse != null)
-            .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
-            .flatMap(gags -> Observable.from(gags))
-            .doOnNext(gag -> mGagRepository.replaceGagItem(gag, mSection))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io());
+//    Observable<Gag> cache = null;
+//    Observable<Gag> disk = mGagRepository.getGagList(mSection, mPageOffset)
+//            .flatMap(gags -> Observable.from(gags))
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(Schedulers.io());
+//    Observable<Gag> network = mGagApiServiceManager.getGagList(mSection, mPageOffset)
+//            // get the paging offset
+//            .doOnNext(apiGagResponse -> {
+//                mPageOffset = apiGagResponse.paging.next;
+//                mInfiniteScrollView.setIsLoading(true);
+//            })
+//            .doOnCompleted(() -> {
+//                mInfiniteScrollView.setIsLoading(false);
+//                Log.d(TAG, "getNetworkGagSubscription: api completed page=" + mPageOffset);
+//            })
+//            .onErrorReturn(throwable -> {
+//                throwable.printStackTrace();
+//                mInfiniteScrollView.setIsLoading(false);
+//                mSwipeRefreshLayout.setRefreshing(false);
+//                return null; // Return null for any errors
+//            })
+//            .filter(apiGagResponse -> apiGagResponse != null)
+//            .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
+//            .flatMap(gags -> Observable.from(gags))
+//            .doOnNext(gag -> mGagRepository.replaceGagItem(gag, mSection))
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(Schedulers.io());
+//
+//    Observable<Gag> source = Observable
+//                                .concat(disk, network)
+//                                .first();
 
-    Observable<Gag> source = Observable
-                                .concat(disk, network)
-                                .first();
-
-    private Subscription getDBAndNetworkGagSubscription() {
-        return source.subscribe();
-    }
+//    private Subscription getDBAndNetworkGagSubscription() {
+//        return source.subscribe();
+//    }
 }
