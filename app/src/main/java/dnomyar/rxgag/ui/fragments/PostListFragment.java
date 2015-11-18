@@ -83,6 +83,10 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         PostItemRenderer postItemRenderer = new PostItemRenderer();
         mInfiniteScrollView.setAdapter(new PostListAdapter(mGagList, postItemRenderer));
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
+        mSwipeRefreshLayout.setOnRefreshListener(this::scrollToTopAndRefresh);
+        if (savedInstanceState == null) {
+            mInit = getGagSubscription();
+        }
     }
 
     @Override
@@ -92,22 +96,6 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         mGagList = new ArrayList<>();
         mSection = getArguments().getString("section");
         mSection = mSection.toLowerCase();
-        if (savedInstanceState == null) {
-//            mInit = mGagApiServiceManager.getGagList(mSection, mPageOffset)
-//                    .doOnNext(apiGagResponse -> {
-//                        mPageOffset = apiGagResponse.paging.next;
-//                        mInfiniteScrollView.setIsLoading(true);
-//                    })
-//                    .doOnCompleted(() -> mInfiniteScrollView.setIsLoading(false))
-//                    .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(Schedulers.io())
-//                    .subscribe(gagList -> {
-//                        mGagList.addAll(gagList);
-//                        mInfiniteScrollView.getAdapter().notifyItemRangeInserted(0, gagList.size());
-//                    });
-            mInit = getGagSubscription();
-        }
     }
 
     @Override
@@ -151,21 +139,30 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     }
 
     public void scrollToTopAndRefresh() {
+        mPageOffset = "0";
         mInfiniteScrollView.scrollToPosition(0);
         mGagList.clear();
         mInfiniteScrollView.getAdapter().notifyDataSetChanged();
         mInit = getGagSubscription();
     }
 
+    // FIXME: 2015-11-18 Better to create an Observable rather than Subscription
     private Subscription getGagSubscription() {
+
         return mGagApiServiceManager.getGagList(mSection, mPageOffset)
                 // get the paging offset
                 .doOnNext(apiGagResponse -> {
                     mPageOffset = apiGagResponse.paging.next;
                     mInfiniteScrollView.setIsLoading(true);
                 })
-                .onErrorReturn(throwable -> {
+                .doOnCompleted(() -> {
                     mInfiniteScrollView.setIsLoading(false);
+                    Log.d(TAG, "getGagSubscription: api completed page=" + mPageOffset);
+                })
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    mInfiniteScrollView.setIsLoading(false);
+                    mSwipeRefreshLayout.setRefreshing(false);
                     return null; // Return null for any errors
                 })
                 // Skip all null result
@@ -178,22 +175,25 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
                 .observeOn(AndroidSchedulers.mainThread())
                 // The sequence should be generated from background thread
                 .subscribeOn(Schedulers.io())
-                // onNext()
-                .subscribe(gag -> {
-                    mGagList.add(gag);
-                    mInfiniteScrollView.getAdapter().notifyItemInserted(mGagList.size());
-                },
-                // onError()
-                    throwable -> {
-                    // Subscribe to Error events on UI thread
-                    Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    mInfiniteScrollView.setIsLoading(false);
-                },
-                // onCompleted
-                    () -> {
-                        // The whole sequence is completed
-                        Toast.makeText(getActivity(), mPageOffset, Toast.LENGTH_SHORT).show();
-                        mInfiniteScrollView.setIsLoading(false);
+                        // onNext()
+                .subscribe(
+                        gag -> {
+                            mGagList.add(gag);
+                            mInfiniteScrollView.getAdapter().notifyItemInserted(mGagList.size());
+                        },
+                        // onError()
+                        throwable -> {
+                            throwable.printStackTrace();
+                            // Subscribe to Error events on UI thread
+                            Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        },
+                        // onCompleted
+                        () -> {
+                            // The whole sequence is completed
+                            Toast.makeText(getActivity(), mPageOffset, Toast.LENGTH_SHORT).show();
+                            mSwipeRefreshLayout.setRefreshing(false);
+                            Log.d(TAG, "getGagSubscription: completed");
                 });
     }
 }

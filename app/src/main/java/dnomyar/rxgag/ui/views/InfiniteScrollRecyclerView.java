@@ -10,6 +10,7 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 
 /**
  * Created by Raymond on 2015-11-10.
@@ -36,7 +37,10 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         mScrollEventSubscriber = RxRecyclerView.scrollStateChanges(this)
-                .filter(isLoading -> ! isLoading()) // Filter all scrolling events when it's already loading
+                .filter(integer -> {
+                    Log.d(TAG, "call: " + mIsLoading);
+                    return ! mIsLoading;
+                }) // Filter all scrolling events when it's already loading
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onScrollStateChanges); // What to do with scrolling event?
     }
@@ -64,6 +68,7 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
                 Log.d(TAG, "onScrollStateChanged: Load more");
                 if (mInfiniteScrollListener != null) {
                     mInfiniteScrollListener.dispatchLoadMore();
+                    mIsLoading = true;
                 }
             }
             Log.d(TAG, "onScrollStateChanged: " + firstVisiblePosition);
@@ -72,6 +77,7 @@ public class InfiniteScrollRecyclerView extends RecyclerView {
 
     public void setIsLoading(boolean isLoading) {
         mIsLoading = isLoading;
+        Log.d(TAG, "setIsLoading: " + mIsLoading);
     }
 
     public boolean isLoading() {
