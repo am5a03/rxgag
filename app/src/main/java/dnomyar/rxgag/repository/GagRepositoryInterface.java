@@ -10,6 +10,6 @@ import rx.Observable;
  * Created by Raymond on 2015-11-17.
  */
 public interface GagRepositoryInterface {
-    Observable<List<GagItem>> getGagListItem(String section, String page);
-    Observable<GagItem> replaceGagItem(Gag gag, String section);
+    Observable<List<Gag>> getGagList(String section, String page);
+    Observable<Gag> replaceGagItem(Gag gag, String section);
 }

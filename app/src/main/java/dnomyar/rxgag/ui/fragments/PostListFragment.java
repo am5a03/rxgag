@@ -15,24 +15,20 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
-import dnomyar.rxgag.models.api.ApiGagResponse;
 import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.network.GagApiServiceManager;
+import dnomyar.rxgag.repository.GagRepositoryInterface;
 import dnomyar.rxgag.ui.adapters.PostListAdapter;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
 import dnomyar.rxgag.ui.views.InfiniteScrollRecyclerView;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -49,6 +45,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     private GagApiServiceManager mGagApiServiceManager;
+    private GagRepositoryInterface mGagRepository;
     private List<Gag> mGagList;
     private String mPageOffset = "0";
     private String mSection;
@@ -85,7 +82,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
         mSwipeRefreshLayout.setOnRefreshListener(this::scrollToTopAndRefresh);
         if (savedInstanceState == null) {
-            mInit = getGagSubscription();
+            mInit = getNetworkGagSubscription();
         }
     }
 
@@ -134,7 +131,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
 
     @Override
     public void dispatchLoadMore() {
-        mLoadMore = getGagSubscription();
+        mLoadMore = getNetworkGagSubscription();
 
     }
 
@@ -143,11 +140,11 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         mInfiniteScrollView.scrollToPosition(0);
         mGagList.clear();
         mInfiniteScrollView.getAdapter().notifyDataSetChanged();
-        mInit = getGagSubscription();
+        mInit = getNetworkGagSubscription();
     }
 
     // FIXME: 2015-11-18 Better to create an Observable rather than Subscription
-    private Subscription getGagSubscription() {
+    private Subscription getNetworkGagSubscription() {
 
         return mGagApiServiceManager.getGagList(mSection, mPageOffset)
                 // get the paging offset
@@ -157,7 +154,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
                 })
                 .doOnCompleted(() -> {
                     mInfiniteScrollView.setIsLoading(false);
-                    Log.d(TAG, "getGagSubscription: api completed page=" + mPageOffset);
+                    Log.d(TAG, "getNetworkGagSubscription: api completed page=" + mPageOffset);
                 })
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
@@ -193,7 +190,44 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
                             // The whole sequence is completed
                             Toast.makeText(getActivity(), mPageOffset, Toast.LENGTH_SHORT).show();
                             mSwipeRefreshLayout.setRefreshing(false);
-                            Log.d(TAG, "getGagSubscription: completed");
+                            Log.d(TAG, "getNetworkGagSubscription: completed");
                 });
+    }
+
+
+    Observable<Gag> cache = null;
+    Observable<Gag> disk = mGagRepository.getGagList(mSection, mPageOffset)
+            .flatMap(gags -> Observable.from(gags))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io());
+    Observable<Gag> network = mGagApiServiceManager.getGagList(mSection, mPageOffset)
+            // get the paging offset
+            .doOnNext(apiGagResponse -> {
+                mPageOffset = apiGagResponse.paging.next;
+                mInfiniteScrollView.setIsLoading(true);
+            })
+            .doOnCompleted(() -> {
+                mInfiniteScrollView.setIsLoading(false);
+                Log.d(TAG, "getNetworkGagSubscription: api completed page=" + mPageOffset);
+            })
+            .onErrorReturn(throwable -> {
+                throwable.printStackTrace();
+                mInfiniteScrollView.setIsLoading(false);
+                mSwipeRefreshLayout.setRefreshing(false);
+                return null; // Return null for any errors
+            })
+            .filter(apiGagResponse -> apiGagResponse != null)
+            .map(apiGagResponse -> Arrays.asList(apiGagResponse.data))
+            .flatMap(gags -> Observable.from(gags))
+            .doOnNext(gag -> mGagRepository.replaceGagItem(gag, mSection))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io());
+
+    Observable<Gag> source = Observable
+                                .concat(disk, network)
+                                .first();
+
+    private Subscription getDBAndNetworkGagSubscription() {
+        return source.subscribe();
     }
 }

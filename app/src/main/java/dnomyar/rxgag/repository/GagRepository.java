@@ -3,6 +3,7 @@ package dnomyar.rxgag.repository;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dnomyar.rxgag.models.db.GagImage;
@@ -29,23 +30,33 @@ public class GagRepository implements GagRepositoryInterface {
     }
 
     @Override
-    public Observable<List<GagItem>> getGagListItem(String section, String page) {
-        return RealmObservable.results(mContext, new Func1<Realm, RealmResults<GagItem>>() {
-            @Override
-            public RealmResults<GagItem> call(Realm realm) {
-                return realm.where(GagItem.class).findAll();
+    public Observable<List<Gag>> getGagList(String section, String page) {
+        return RealmObservable.results(mContext, realm -> realm.where(GagItem.class)
+                .equalTo("section", section)
+                .findAll())
+        .map(gagItems -> {
+            ArrayList<Gag> gags = new ArrayList<Gag>();
+            for (GagItem gagItem : gagItems) {
+                Gag g = new Gag();
+                g.id = gagItem.getId();
+                g.caption = gagItem.getCaption();
+
+                g.images = new Gag.Images();
+                g.images.large = gagItem.getImages().getLarge();
+                g.images.normal = gagItem.getImages().getNormal();
+                g.images.small = gagItem.getImages().getSmall();
+
+                g.votes = new Gag.Votes();
+                g.votes.count = gagItem.getVotes().getCount();
+
+                gags.add(g);
             }
-        })
-        .map(new Func1<RealmResults<GagItem>, List<GagItem>>() {
-            @Override
-            public List<GagItem> call(RealmResults<GagItem> gagItems) {
-                return null;
-            }
+            return gags;
         });
     }
 
     @Override
-    public Observable<GagItem> replaceGagItem(Gag gag, String section) {
+    public Observable<Gag> replaceGagItem(Gag gag, String section) {
         return RealmObservable.object(mContext, realm -> {
             GagItem item = new GagItem();
             item.setId(gag.id);
@@ -62,6 +73,6 @@ public class GagRepository implements GagRepositoryInterface {
             item.setVotes(vote);
             Log.d(TAG, "replaceGagItem: " + item.getId());
             return realm.copyToRealmOrUpdate(item);
-        });
+        }).map(gagItem -> null);
     }
 }
