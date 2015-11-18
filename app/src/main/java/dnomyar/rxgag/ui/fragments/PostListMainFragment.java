@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -96,7 +97,12 @@ public class PostListMainFragment extends BaseFragment {
                 .subscribe(tabLayoutSelectionEvent -> {
                     if (tabLayoutSelectionEvent.kind() ==
                             TabLayoutSelectionEvent.Kind.RESELECTED) {
-
+                        Log.d(TAG, "onStart: reselcted");
+                        FragmentStatePagerAdapter adapter
+                                = (FragmentStatePagerAdapter) mViewPager.getAdapter();
+                        PostListFragment f
+                                = (PostListFragment) adapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
+                        f.scrollToTopAndRefresh();
                     } else if (tabLayoutSelectionEvent.kind() ==
                             TabLayoutSelectionEvent.Kind.SELECTED) {
                         mViewPager.setCurrentItem(mTabLayout.getSelectedTabPosition());

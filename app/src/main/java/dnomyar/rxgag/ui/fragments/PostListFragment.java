@@ -150,6 +150,13 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
 
     }
 
+    public void scrollToTopAndRefresh() {
+        mInfiniteScrollView.scrollToPosition(0);
+        mGagList.clear();
+        mInfiniteScrollView.getAdapter().notifyDataSetChanged();
+        mInit = getGagSubscription();
+    }
+
     private Subscription getGagSubscription() {
         return mGagApiServiceManager.getGagList(mSection, mPageOffset)
                 // get the paging offset
@@ -180,6 +187,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
                     throwable -> {
                     // Subscribe to Error events on UI thread
                     Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    mInfiniteScrollView.setIsLoading(false);
                 },
                 // onCompleted
                     () -> {
