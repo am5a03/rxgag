@@ -3,7 +3,7 @@ package dnomyar.rxgag.models.wrapper;
 /**
  * Created by Raymond on 2015-11-01.
  */
-public class Gag {
+public class ApiGag {
     public String id;
     public String caption;
     public String link;

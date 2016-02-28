@@ -4,7 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import java.util.List;
-import dnomyar.rxgag.models.wrapper.Gag;
+
+import dnomyar.rxgag.models.wrapper.ApiGag;
 import dnomyar.rxgag.ui.renderers.LoadingIndicatorRenderer;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
 
@@ -13,16 +14,16 @@ import dnomyar.rxgag.ui.renderers.PostItemRenderer;
  */
 public class PostListAdapter extends RecyclerView.Adapter {
 
-    List<Gag> mGagList;
+    List<ApiGag> mApiGagList;
     PostItemRenderer mPostItemRenderer;
     LoadingIndicatorRenderer mLoadingIndicatorRenderer;
 
     private static final int VIEW_TYPE_POST = 0;
     private static final int VIEW_TYPE_LOADING_INDICATOR = 1;
 
-    public PostListAdapter (List<Gag> gagList, PostItemRenderer postItemRenderer) {
+    public PostListAdapter (List<ApiGag> apiGagList, PostItemRenderer postItemRenderer) {
         mPostItemRenderer = postItemRenderer;
-        mGagList = gagList;
+        mApiGagList = apiGagList;
         mLoadingIndicatorRenderer = new LoadingIndicatorRenderer();
     }
 
@@ -43,7 +44,7 @@ public class PostListAdapter extends RecyclerView.Adapter {
         switch (viewType) {
             case VIEW_TYPE_POST:
                 mPostItemRenderer.onBindViewHolder(holder, position,
-                        mGagList.get(mapAdapterPositionToItemPosition(position)));
+                        mApiGagList.get(mapAdapterPositionToItemPosition(position)));
                 return;
             case VIEW_TYPE_LOADING_INDICATOR:
                 mLoadingIndicatorRenderer.onBindViewHolder(holder, position, null);
@@ -62,7 +63,7 @@ public class PostListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return mGagList.size() + 1;
+        return mApiGagList.size() + 1;
     }
 
     protected int mapAdapterPositionToItemPosition(int position) {

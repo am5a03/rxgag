@@ -15,7 +15,7 @@ public class SQLiteDatabaseHelper {
     private DaoMaster daoMaster;
     private DaoSession daoSession;
 
-    private GagRepositoryInterface mGagRepositoryInterface;
+    private SQLiteGagRepository mGagRepositoryInterface;
 
     private static final SQLiteDatabaseHelper sInstance = new SQLiteDatabaseHelper();
 
@@ -37,7 +37,7 @@ public class SQLiteDatabaseHelper {
         return sInstance;
     }
 
-    public GagRepositoryInterface getGagRepository() {
+    public SQLiteGagRepository getGagRepository() {
         return mGagRepositoryInterface;
     }
 

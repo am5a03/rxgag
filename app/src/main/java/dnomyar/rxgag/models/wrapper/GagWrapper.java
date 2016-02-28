@@ -5,5 +5,5 @@ import dnomyar.rxgag.repository.blitz.BlitzItem;
 /**
  * Created by Raymond on 2016-02-28.
  */
-public class GagWrapper extends BlitzItem<Gag> {
+public class GagWrapper extends BlitzItem<ApiGag> {
 }

@@ -7,7 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import dnomyar.rxgag.R;
-import dnomyar.rxgag.models.wrapper.Gag;
+import dnomyar.rxgag.models.wrapper.ApiGag;
 
 /**
  * Created by Raymond on 2015-11-12.
@@ -26,7 +26,7 @@ public class LoadingIndicatorRenderer {
         return new ProgressBarViewHolder(v);
     }
 
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, Gag gag) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, ApiGag apiGag) {
 
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 import dnomyar.rxgag.models.db.realm.GagImage;
 import dnomyar.rxgag.models.db.realm.GagItem;
 import dnomyar.rxgag.models.db.realm.GagVote;
-import dnomyar.rxgag.models.wrapper.Gag;
+import dnomyar.rxgag.models.wrapper.ApiGag;
 import dnomyar.rxgag.repository.GagRepositoryInterface;
 import dnomyar.rxgag.repository.realm.rx.RealmObservable;
 import rx.Observable;
@@ -28,44 +28,44 @@ public class RealmGagRepository implements GagRepositoryInterface {
     }
 
     @Override
-    public Observable<List<Gag>> getGagList(String section, String page) {
+    public Observable<List<ApiGag>> getGagList(String section, String page) {
         return RealmObservable.results(mContext, realm -> realm.where(GagItem.class)
                 .equalTo("section", section)
                 .findAll())
         .map(gagItems -> {
-            ArrayList<Gag> gags = new ArrayList<Gag>();
+            ArrayList<ApiGag> apiGags = new ArrayList<ApiGag>();
             for (GagItem gagItem : gagItems) {
-                Gag g = new Gag();
+                ApiGag g = new ApiGag();
                 g.id = gagItem.getId();
                 g.caption = gagItem.getCaption();
 
-                g.images = new Gag.Images();
+                g.images = new ApiGag.Images();
                 g.images.large = gagItem.getImages().getLarge();
                 g.images.normal = gagItem.getImages().getNormal();
                 g.images.small = gagItem.getImages().getSmall();
 
-                g.votes = new Gag.Votes();
+                g.votes = new ApiGag.Votes();
                 g.votes.count = gagItem.getVotes().getCount();
 
-                gags.add(g);
+                apiGags.add(g);
             }
-            return gags;
+            return apiGags;
         });
     }
 
     @Override
-    public Observable<Gag> replaceGagItem(Gag gag, String section) {
+    public Observable<ApiGag> replaceGagItem(ApiGag apiGag, String section) {
         return RealmObservable.object(mContext, realm -> {
             GagItem item = new GagItem();
-            item.setId(gag.id);
-            item.setCaption(gag.caption);
+            item.setId(apiGag.id);
+            item.setCaption(apiGag.caption);
             GagImage image = new GagImage();
-            image.setLarge(gag.images.large);
-            image.setNormal(gag.images.normal);
-            image.setSmall(gag.images.small);
+            image.setLarge(apiGag.images.large);
+            image.setNormal(apiGag.images.normal);
+            image.setSmall(apiGag.images.small);
 
             GagVote vote = new GagVote();
-            vote.setCount(gag.votes.count);
+            vote.setCount(apiGag.votes.count);
 
             item.setImages(image);
             item.setVotes(vote);

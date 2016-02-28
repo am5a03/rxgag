@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import dnomyar.rxgag.R;
+import dnomyar.rxgag.RxGagApplication;
 import dnomyar.rxgag.ui.fragments.PostListFragment;
 import dnomyar.rxgag.ui.fragments.PostListMainFragment;
 
@@ -18,5 +19,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, PostListMainFragment.newInstance());
         ft.commit();
+
+        RxGagApplication.getDB();
     }
 }

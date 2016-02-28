@@ -12,7 +12,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
-import dnomyar.rxgag.models.wrapper.Gag;
+import dnomyar.rxgag.models.wrapper.ApiGag;
 
 /**
  * Created by Raymond on 2015-11-11.
@@ -25,9 +25,9 @@ public class PostItemRenderer {
         return new PostItemViewHolder(v);
     }
 
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, Gag gag) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, ApiGag apiGag) {
         PostItemViewHolder vh = (PostItemViewHolder) holder;
-        vh.bindPost(gag);
+        vh.bindPost(apiGag);
     }
 
     static class PostItemViewHolder extends RecyclerView.ViewHolder {
@@ -40,10 +40,10 @@ public class PostItemRenderer {
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindPost(Gag gag) {
-            mTitle.setText(gag.caption);
-            mPoints.setText(String.format(itemView.getContext().getString(R.string.points), gag.votes.count));
-            mImage.setImageURI(Uri.parse(gag.images.large));
+        public void bindPost(ApiGag apiGag) {
+            mTitle.setText(apiGag.caption);
+            mPoints.setText(String.format(itemView.getContext().getString(R.string.points), apiGag.votes.count));
+            mImage.setImageURI(Uri.parse(apiGag.images.large));
         }
     }
 }

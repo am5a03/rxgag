@@ -20,7 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
-import dnomyar.rxgag.models.wrapper.Gag;
+import dnomyar.rxgag.models.wrapper.ApiGag;
 import dnomyar.rxgag.network.GagApiServiceManager;
 import dnomyar.rxgag.repository.realm.RealmGagRepository;
 import dnomyar.rxgag.repository.GagRepositoryInterface;
@@ -47,7 +47,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
 
     private GagApiServiceManager mGagApiServiceManager;
     private GagRepositoryInterface mGagRepository;
-    private List<Gag> mGagList;
+    private List<ApiGag> mApiGagList;
     private String mPageOffset = "0";
     private String mSection;
 
@@ -79,7 +79,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         mInfiniteScrollView.addInfiniteScrollListener(this);
         mInfiniteScrollView.setItemAnimator(new DefaultItemAnimator());
         PostItemRenderer postItemRenderer = new PostItemRenderer();
-        mInfiniteScrollView.setAdapter(new PostListAdapter(mGagList, postItemRenderer));
+        mInfiniteScrollView.setAdapter(new PostListAdapter(mApiGagList, postItemRenderer));
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
         mSwipeRefreshLayout.setOnRefreshListener(this::scrollToTopAndRefresh);
         if (savedInstanceState == null) {
@@ -92,7 +92,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
         super.onCreate(savedInstanceState);
         mGagApiServiceManager = new GagApiServiceManager(RxGagApplication.getClient());
         mGagRepository = new RealmGagRepository(getActivity());
-        mGagList = new ArrayList<>();
+        mApiGagList = new ArrayList<>();
         mSection = getArguments().getString("section");
         mSection = mSection.toLowerCase();
     }
@@ -139,7 +139,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     public void scrollToTopAndRefresh() {
         mPageOffset = "0";
         mInfiniteScrollView.scrollToPosition(0);
-        mGagList.clear();
+        mApiGagList.clear();
         mInfiniteScrollView.getAdapter().notifyDataSetChanged();
         mInit = getNetworkGagSubscription();
     }
@@ -176,8 +176,8 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
                         // onNext()
                 .subscribe(
                         gag -> {
-                            mGagList.add(gag);
-                            mInfiniteScrollView.getAdapter().notifyItemInserted(mGagList.size());
+                            mApiGagList.add(gag);
+                            mInfiniteScrollView.getAdapter().notifyItemInserted(mApiGagList.size());
                         },
                         // onError()
                         throwable -> {
@@ -196,12 +196,12 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     }
 
 
-//    Observable<Gag> cache = null;
-//    Observable<Gag> disk = mGagRepository.getGagList(mSection, mPageOffset)
+//    Observable<ApiGag> cache = null;
+//    Observable<ApiGag> disk = mGagRepository.getGagList(mSection, mPageOffset)
 //            .flatMap(gags -> Observable.from(gags))
 //            .observeOn(AndroidSchedulers.mainThread())
 //            .subscribeOn(Schedulers.io());
-//    Observable<Gag> network = mGagApiServiceManager.getGagList(mSection, mPageOffset)
+//    Observable<ApiGag> network = mGagApiServiceManager.getGagList(mSection, mPageOffset)
 //            // get the paging offset
 //            .doOnNext(apiGagResponse -> {
 //                mPageOffset = apiGagResponse.paging.next;
@@ -224,7 +224,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
 //            .observeOn(AndroidSchedulers.mainThread())
 //            .subscribeOn(Schedulers.io());
 //
-//    Observable<Gag> source = Observable
+//    Observable<ApiGag> source = Observable
 //                                .concat(disk, network)
 //                                .first();
 
