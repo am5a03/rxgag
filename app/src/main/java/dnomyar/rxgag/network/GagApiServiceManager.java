@@ -12,7 +12,7 @@ import rx.Observable;
  * Created by Raymond on 2015-11-02.
  */
 public class GagApiServiceManager {
-    protected static final String HOST = "http://infinigag.eu01.aws.af.cm";
+    protected static final String HOST = "http://infinigag.k3min.eu";
 
     private GagListService mGagListService;
 

@@ -22,7 +22,7 @@ import dnomyar.rxgag.R;
 import dnomyar.rxgag.RxGagApplication;
 import dnomyar.rxgag.models.wrapper.Gag;
 import dnomyar.rxgag.network.GagApiServiceManager;
-import dnomyar.rxgag.repository.GagRepository;
+import dnomyar.rxgag.repository.realm.RealmGagRepository;
 import dnomyar.rxgag.repository.GagRepositoryInterface;
 import dnomyar.rxgag.ui.adapters.PostListAdapter;
 import dnomyar.rxgag.ui.renderers.PostItemRenderer;
@@ -91,7 +91,7 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGagApiServiceManager = new GagApiServiceManager(RxGagApplication.getClient());
-        mGagRepository = new GagRepository(getActivity());
+        mGagRepository = new RealmGagRepository(getActivity());
         mGagList = new ArrayList<>();
         mSection = getArguments().getString("section");
         mSection = mSection.toLowerCase();
@@ -134,7 +134,6 @@ public class PostListFragment extends BaseFragment implements InfiniteScrollRecy
     @Override
     public void dispatchLoadMore() {
         mLoadMore = getNetworkGagSubscription();
-
     }
 
     public void scrollToTopAndRefresh() {

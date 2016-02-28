@@ -1,4 +1,4 @@
-package dnomyar.rxgag.repository;
+package dnomyar.rxgag.repository.realm;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,26 +6,24 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import dnomyar.rxgag.models.db.GagImage;
-import dnomyar.rxgag.models.db.GagItem;
-import dnomyar.rxgag.models.db.GagVote;
+import dnomyar.rxgag.models.db.realm.GagImage;
+import dnomyar.rxgag.models.db.realm.GagItem;
+import dnomyar.rxgag.models.db.realm.GagVote;
 import dnomyar.rxgag.models.wrapper.Gag;
+import dnomyar.rxgag.repository.GagRepositoryInterface;
 import dnomyar.rxgag.repository.realm.rx.RealmObservable;
-import io.realm.Realm;
-import io.realm.RealmResults;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Created by Raymond on 2015-11-17.
  */
-public class GagRepository implements GagRepositoryInterface {
+public class RealmGagRepository implements GagRepositoryInterface {
 
-    private static final String TAG = "GagRepository";
+    private static final String TAG = "RealmGagRepository";
 
     private final Context mContext;
 
-    public GagRepository(Context context) {
+    public RealmGagRepository(Context context) {
         mContext = context;
     }
 

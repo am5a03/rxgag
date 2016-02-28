@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * Created by Raymond on 2015-11-11.
  */
-public class GagList {
+public class GagListWrapper {
     List<Gag> mGagList;
 
-    public GagList(List<Gag> gagList) {
+    public GagListWrapper(List<Gag> gagList) {
         mGagList = mGagList;
     }
 

@@ -2,7 +2,6 @@ package dnomyar.rxgag.repository;
 
 import java.util.List;
 
-import dnomyar.rxgag.models.db.GagItem;
 import dnomyar.rxgag.models.wrapper.Gag;
 import rx.Observable;
 

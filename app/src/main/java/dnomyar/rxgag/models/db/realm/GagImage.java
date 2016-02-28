@@ -1,4 +1,4 @@
-package dnomyar.rxgag.models.db;
+package dnomyar.rxgag.models.db.realm;
 
 import io.realm.RealmObject;
 
